@@ -1,7 +1,6 @@
 'use client';
 
 import { getJournalProgram, getJournalProgramId } from '@journal/anchor';
-import { Program } from '@coral-xyz/anchor';
 import { useConnection } from '@solana/wallet-adapter-react';
 import { Cluster, Keypair, PublicKey } from '@solana/web3.js';
 import { useMutation, useQuery } from '@tanstack/react-query';
@@ -15,11 +14,6 @@ import { useTransactionToast } from '../ui/ui-layout';
 interface EntryArgs{
   title:string;
   message:string;
-  owner:PublicKey;
-}
-interface UpdateArgs{
-  title:string;
-  new_message:string;
   owner:PublicKey;
 }
 export function useJournalProgram() {
@@ -85,7 +79,7 @@ export function useJournalProgramAccount({ account }: { account: PublicKey }) {
         [Buffer.from(title),owner.toBuffer()],
         programId
       );
-      return program.methods.updateEntry(title, message).accounts({journalEntry: journalEntryAddress}).rpc()
+      return program.methods.updateEntry(title, message).accounts({journalEntry: journalEntryAddress}).rpc();
     },
     onSuccess: signature => {
       transactionToast(signature);
@@ -97,7 +91,7 @@ export function useJournalProgramAccount({ account }: { account: PublicKey }) {
   const deleteEntry = useMutation({
     mutationKey: ['journal', 'delete', { cluster, account }],
     mutationFn: async(title:string) => {
-      program.methods.deleteEntry(title).accounts({ journalEntry: account }).rpc()
+      program.methods.deleteEntry(title).accounts({ journalEntry: account }).rpc();
     },
     onSuccess: (tx) => {
       transactionToast(tx);
@@ -107,6 +101,7 @@ export function useJournalProgramAccount({ account }: { account: PublicKey }) {
 
   return {
     accountQuery,
-    closeMutation
+    updateEntry,
+    deleteEntry
   };
 }
